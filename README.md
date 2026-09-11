@@ -1,12 +1,20 @@
-# Object Detection and Tracking using YOLO
+# Object Detection and Tracking Using YOLO11
 
 ## Project Overview
 
-This project implements object detection and object tracking using the YOLO (You Only Look Once) deep learning model.
+This project implements **object detection and object tracking using YOLO11**.
 
-The system can detect objects in images and detect and track objects in videos. It uses the Ultralytics YOLO model and OpenCV for computer vision and video processing.
+The system can:
 
-The detected objects are displayed with bounding boxes, object names, confidence scores, and tracking IDs.
+* Detect objects in images.
+* Detect objects in video frames.
+* Track detected objects across consecutive video frames.
+* Display bounding boxes around detected objects.
+* Display object names and confidence scores.
+* Display tracking information for objects in videos.
+* Save the processed image and video results.
+
+The project is developed using **Python, Ultralytics YOLO11, and OpenCV**.
 
 ---
 
@@ -14,20 +22,21 @@ The detected objects are displayed with bounding boxes, object names, confidence
 
 The main objectives of this project are:
 
-* To detect objects in images using YOLO.
+* To perform object detection using a pre-trained YOLO11 model.
+* To detect multiple objects in an input image.
 * To detect objects in video frames.
-* To track detected objects across multiple video frames.
-* To display bounding boxes around detected objects.
-* To display object names and confidence scores.
-* To assign tracking IDs to objects in videos.
-* To save the processed image and video results.
+* To track detected objects across video frames.
+* To display bounding boxes and object labels.
+* To display confidence scores for detected objects.
+* To generate processed image and video outputs.
+* To demonstrate the practical application of deep learning and computer vision.
 
 ---
 
 ## Technologies Used
 
 * **Python**
-* **YOLO**
+* **YOLO11**
 * **Ultralytics**
 * **OpenCV**
 * **Computer Vision**
@@ -65,48 +74,60 @@ CodeAlpha_ObjectDetectionTracking/
 ├── track.py
 ├── requirements.txt
 ├── README.md
-└── venv/
+├── .gitignore
+└── yolo11n.pt
 ```
+
+> Note: The `venv/` folder is used locally for the Python virtual environment and is excluded from GitHub using `.gitignore`.
 
 ---
 
-## Project Workflow
+# Project Workflow
 
-The project follows these main steps:
+## Image Detection Workflow
 
 ```text
 Input Image
-     ↓
-YOLO Object Detection
-     ↓
-Detected Objects
-     ↓
-Bounding Boxes + Confidence
-     ↓
-Output Image
+     |
+     v
+YOLO11 Model
+     |
+     v
+Object Detection
+     |
+     v
+Bounding Boxes + Labels + Confidence
+     |
+     v
+Processed Output Image
 ```
 
-For video:
+## Video Tracking Workflow
 
 ```text
 Input Video
-     ↓
-YOLO Object Detection
-     ↓
+     |
+     v
+Read Video Frames
+     |
+     v
+YOLO11 Object Detection
+     |
+     v
 Object Tracking
-     ↓
-Tracking IDs
-     ↓
-Bounding Boxes + Object Labels
-     ↓
-Output Video
+     |
+     v
+Bounding Boxes + Labels + Tracking Information
+     |
+     v
+Processed Output Video
 ```
 
 ---
 
 # 1. Image Object Detection
 
-The `detect_image.py` program is used to detect objects in an input image.
+The `detect_image.py` program is used to perform object detection on an input image.
 
 The input image is stored in:
 
@@ -114,23 +135,13 @@ The input image is stored in:
 input_images/test.jpg
 ```
 
-The YOLO model processes the image and identifies the objects present in it.
+The YOLO11 model processes the image and identifies objects that belong to the model's trained classes.
 
-### Example Detection
+The detection result includes:
 
-The test image contains:
-
-* Car
-* Dog
-
-The detected objects are displayed with their confidence scores.
-
-Example:
-
-```text
-Detected: dog | Confidence: 0.86
-Detected: car | Confidence: 0.85
-```
+* Object name
+* Bounding box
+* Confidence score
 
 The processed image is saved to:
 
@@ -138,11 +149,29 @@ The processed image is saved to:
 output/detected_test.jpg
 ```
 
+### Example Detection
+
+For the test image used during development, the detected objects included:
+
+```text
+dog
+car
+```
+
+Example detection results observed during testing:
+
+```text
+Detected: dog | Confidence: 0.86
+Detected: car | Confidence: 0.85
+```
+
+The exact detected objects and confidence scores may vary depending on the input image.
+
 ---
 
 # 2. Video Object Detection and Tracking
 
-The `track.py` program is used for object detection and tracking in a video.
+The `track.py` program is used to perform object detection and tracking on a video.
 
 The input video is stored in:
 
@@ -150,9 +179,15 @@ The input video is stored in:
 input_videos/test_video.mp4
 ```
 
-The YOLO model detects objects in each video frame and tracks them across consecutive frames.
+The program reads the video frame by frame.
 
-The tracking system can assign IDs to detected objects so that the same object can be followed while it moves through the video.
+For each frame:
+
+1. YOLO11 detects objects.
+2. The tracking system attempts to associate detected objects across consecutive frames.
+3. Bounding boxes and labels are generated.
+4. Tracking information is displayed.
+5. The processed frame is written to the output video.
 
 The processed video is saved to:
 
@@ -162,34 +197,66 @@ output/tracked_video.mp4
 
 ---
 
-## Tracking
+# 3. Object Tracking
 
-Object tracking means following the same detected object across multiple frames of a video.
+Object tracking means following detected objects across multiple frames of a video.
+
+The tracking process attempts to maintain an identity for an object while it remains visible across consecutive frames.
 
 For example:
 
 ```text
-Frame 1 → Car → ID 1
-Frame 2 → Car → ID 1
-Frame 3 → Car → ID 1
-Frame 4 → Car → ID 1
+Frame 1 → Object → Tracking ID
+Frame 2 → Same Object → Same/Associated Tracking ID
+Frame 3 → Same Object → Same/Associated Tracking ID
 ```
 
-The tracking ID helps identify the same object throughout the video.
+Tracking performance can depend on:
+
+* Object movement
+* Lighting conditions
+* Object size
+* Occlusion
+* Video quality
+* Camera movement
+* Detection confidence
+
+Tracking IDs may change if the tracker temporarily loses an object or cannot confidently associate it with a previous detection.
 
 ---
 
-# 3. Installation
+# 4. YOLO11 Model
 
-## Step 1: Create the Project Folder
+This project uses the **YOLO11n** model from Ultralytics.
 
-Create the project folder:
+The model is loaded using:
+
+```python
+from ultralytics import YOLO
+
+model = YOLO("yolo11n.pt")
+```
+
+The model is used for both:
+
+* Image object detection
+* Video object detection and tracking
+
+YOLO11n is a lightweight model suitable for demonstrating real-time-style object detection on available computer hardware.
+
+---
+
+# 5. Installation
+
+## Step 1: Clone or Download the Project
+
+Obtain the project repository and open the project folder in Visual Studio Code.
+
+Project folder:
 
 ```text
 CodeAlpha_ObjectDetectionTracking
 ```
-
-Open the folder in Visual Studio Code.
 
 ---
 
@@ -211,7 +278,7 @@ Run:
 venv\Scripts\activate
 ```
 
-After activation, the terminal should show:
+After activation, the terminal should display:
 
 ```text
 (venv)
@@ -221,13 +288,13 @@ After activation, the terminal should show:
 
 ## Step 4: Install Required Packages
 
-Install the required Python packages using:
+Install the required dependencies using:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-The main packages used in this project are:
+The main packages used by this project are:
 
 ```text
 ultralytics
@@ -237,9 +304,15 @@ lap
 
 ---
 
-# 4. Running Image Detection
+# 6. Running Image Detection
 
 Make sure the virtual environment is activated.
+
+Place the input image in:
+
+```text
+input_images/test.jpg
+```
 
 Run:
 
@@ -249,13 +322,14 @@ python detect_image.py
 
 The program will:
 
-1. Load the YOLO model.
+1. Load the YOLO11 model.
 2. Read the input image.
 3. Detect objects.
-4. Display detection results.
-5. Save the processed image.
+4. Generate bounding boxes and labels.
+5. Display the detection result.
+6. Save the processed image.
 
-The output will be saved in:
+The output image will be saved as:
 
 ```text
 output/detected_test.jpg
@@ -263,7 +337,7 @@ output/detected_test.jpg
 
 ---
 
-# 5. Running Video Detection and Tracking
+# 7. Running Video Detection and Tracking
 
 Make sure the input video is available at:
 
@@ -279,140 +353,157 @@ python track.py
 
 The program will:
 
-1. Load the YOLO model.
+1. Load the YOLO11 model.
 2. Open the input video.
 3. Read the video frame by frame.
 4. Detect objects.
 5. Track detected objects.
-6. Draw bounding boxes.
-7. Display object labels.
-8. Display tracking IDs.
-9. Save the processed video.
+6. Draw bounding boxes and labels.
+7. Display tracking information.
+8. Save the processed video.
 
-The final output will be saved to:
+The output video will be saved as:
 
 ```text
 output/tracked_video.mp4
 ```
 
+During processing, the video window can be closed/stopped using the **Q** key.
+
 ---
 
-# 6. Input
+# 8. Input
+
+## Input Image
 
 The project uses:
-
-### Input Image
 
 ```text
 input_images/test.jpg
 ```
 
-### Input Video
+This image is processed using YOLO11 object detection.
+
+## Input Video
+
+The project uses:
 
 ```text
 input_videos/test_video.mp4
 ```
 
-The image and video are used to demonstrate object detection and tracking.
+This video is processed frame by frame for object detection and tracking.
 
 ---
 
-# 7. Output
+# 9. Output
 
-The project generates:
+## Detected Image
 
-### Detected Image
+The image detection result is saved as:
 
 ```text
 output/detected_test.jpg
 ```
 
-This image contains bounding boxes and labels for detected objects.
+The output contains visual annotations such as:
 
-### Tracked Video
+* Bounding boxes
+* Object labels
+* Confidence scores
+
+## Tracked Video
+
+The video tracking result is saved as:
 
 ```text
 output/tracked_video.mp4
 ```
 
-This video contains detected objects, bounding boxes, labels, and tracking information.
+The output video contains visual annotations generated by the YOLO11 detection and tracking process.
 
 ---
 
-# 8. Features
+# 10. Features
 
 The project provides the following features:
 
-* Image object detection.
-* Video object detection.
-* Real-time-style video processing.
-* Object tracking.
-* Bounding box visualization.
-* Object classification labels.
-* Confidence scores.
-* Tracking IDs.
-* Processed output image.
-* Processed output video.
+* Image object detection
+* Video object detection
+* Object tracking
+* Bounding box visualization
+* Object labels
+* Confidence scores
+* Tracking information
+* Processed image generation
+* Processed video generation
+* YOLO11-based computer vision
 
 ---
 
-# 9. Advantages
+# 11. Advantages
 
 * YOLO provides fast object detection.
-* The system can detect multiple objects in the same image or video.
-* Object tracking helps follow objects across video frames.
-* OpenCV provides efficient video processing.
-* The project can be extended to different applications.
+* YOLO11n is relatively lightweight.
+* Multiple objects can be detected in the same frame.
+* Object tracking can help follow objects across video frames.
+* OpenCV provides video processing functionality.
+* The project can be extended for different computer vision applications.
 
 ---
 
-# 10. Applications
+# 12. Limitations
 
-Object detection and tracking can be used in:
-
-* Traffic monitoring.
-* Surveillance systems.
-* Smart transportation.
-* Crowd monitoring.
-* Vehicle tracking.
-* Robotics.
-* Autonomous systems.
-* Sports analysis.
-* Industrial monitoring.
-
----
-
-# 11. Limitations
-
-* Detection accuracy depends on the trained YOLO model.
-* Objects that are not included in the model's trained classes may not be detected correctly.
-* Detection performance can be affected by poor lighting, image quality, object size, and occlusion.
+* Detection depends on the classes supported by the pre-trained YOLO11 model.
+* Objects that are not recognized by the trained model may not be detected correctly.
+* Detection accuracy can be affected by poor lighting and image quality.
+* Small or partially hidden objects can be difficult to detect.
+* Tracking IDs may change when an object is temporarily lost or difficult to associate across frames.
 * Processing speed depends on the available hardware.
+* A custom-trained model may be required for specialized objects that are not well represented by the pre-trained model.
 
 ---
 
-# 12. Future Enhancements
+# 13. Future Enhancements
 
 The project can be improved by:
 
-* Training YOLO on a custom dataset.
-* Adding a web-based interface.
-* Supporting live camera detection.
+* Training YOLO11 on a custom dataset.
+* Adding a web-based interface using Streamlit.
+* Supporting live webcam detection.
 * Adding object counting.
 * Adding vehicle counting.
-* Improving tracking accuracy.
+* Improving tracking stability.
 * Adding real-time alerts.
+* Adding performance metrics.
 * Deploying the system as a web application.
+* Using a custom-trained model for domain-specific objects.
 
 ---
 
-# 13. Conclusion
+# 14. Applications
 
-This project demonstrates object detection and tracking using the YOLO deep learning model.
+Object detection and tracking can be applied to:
 
-The system successfully detects objects in images and performs object detection and tracking in videos. Bounding boxes, object labels, confidence scores, and tracking IDs provide useful visual information about the detected objects.
+* Traffic monitoring
+* Vehicle tracking
+* Surveillance systems
+* Crowd monitoring
+* Robotics
+* Autonomous systems
+* Sports analysis
+* Industrial monitoring
+* Smart transportation
 
-The project demonstrates the practical application of deep learning and computer vision for object detection and tracking.
+---
+
+# 15. Conclusion
+
+This project demonstrates the practical use of **YOLO11, deep learning, and computer vision** for object detection and tracking.
+
+The system performs object detection on images and performs object detection and tracking on video frames. The results are visualized using bounding boxes, object labels, confidence scores, and tracking information.
+
+The project provides a foundation that can be further extended using custom datasets, live camera input, object counting, improved tracking methods, and web-based deployment.
 
 ---
 
